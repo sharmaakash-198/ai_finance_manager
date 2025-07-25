@@ -74,17 +74,18 @@ const AddTransactionForm = ({ accounts, categories ,
     const date = watch("date");
 
     const onSubmit = async (data) => {
+        if (transactionLoading) return; // Prevent duplicate submissions
+        
         console.log("Submitting form with data:", data);
         const formData = {
             ...data,
             amount: parseFloat(data.amount),
         };
         if(editMode){
-            transactionFn(editId, formData);
+            await transactionFn(editId, formData);
         }else {
-            transactionFn(formData);
+            await transactionFn(formData);
         }
-        transactionFn(formData);
     };
 
 

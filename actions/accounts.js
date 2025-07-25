@@ -143,7 +143,90 @@ export async function updateDefaultAccount(accountId) {
     });
 
     revalidatePath("/dashboard");
-    return { success: true, data: serializeTransaction(account) };
+    return { success: true, data: serializeDecimal(account) };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteAccount(accountId) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Get the account to check if it exists and belongs to the user
+    const account = await db.account.findUnique({
+      where: {
+        id: accountId,
+        userId: user.id,
+      },
+      include: {
+        transactions: true,
+        _count: {
+          select: { transactions: true },
+        },
+      },
+    });
+
+    if (!account) {
+      throw new Error("Account not found");
+    }
+
+    // Check if account has transactions
+    if (account._count.transactions > 0) {
+      throw new Error(
+        "Cannot delete account with existing transactions. Please delete all transactions first or transfer them to another account."
+      );
+    }
+
+    // Check if this is the only account
+    const accountCount = await db.account.count({
+      where: { userId: user.id },
+    });
+
+    if (accountCount <= 1) {
+      throw new Error(
+        "Cannot delete your only account. You must have at least one account."
+      );
+    }
+
+    // If this is the default account, set another account as default
+    if (account.isDefault) {
+      const otherAccount = await db.account.findFirst({
+        where: {
+          userId: user.id,
+          id: { not: accountId },
+        },
+      });
+
+      if (otherAccount) {
+        await db.account.update({
+          where: { id: otherAccount.id },
+          data: { isDefault: true },
+        });
+      }
+    }
+
+    // Delete the account
+    await db.account.delete({
+      where: {
+        id: accountId,
+        userId: user.id,
+      },
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/account");
+
+    return { success: true, message: "Account deleted successfully" };
   } catch (error) {
     return { success: false, error: error.message };
   }

@@ -55,6 +55,7 @@ export function CreateAccountDrawer({ children }) {
   } = useFetch(createAccount);
 
   const onSubmit = async (data) => {
+    if (createAccountLoading) return; // Prevent duplicate submissions
     await createAccountFn(data);
   };
 
