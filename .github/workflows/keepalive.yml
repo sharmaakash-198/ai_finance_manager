@@ -1,0 +1,17 @@
+name: Keep Supabase Awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping health endpoint
+        run: |
+          curl -s https://ai-finance-manager-app.vercel.app/api/health
+          sleep 5
+          curl -s https://ai-finance-manager-app.vercel.app/api/health
