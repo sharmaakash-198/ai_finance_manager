@@ -9,6 +9,7 @@ import { scanReceipt } from "@/actions/transaction";
 
 export function ReceiptScanner({ onScanComplete }) {
   const fileInputRef = useRef(null);
+  const lastFileRef = useRef(null);
 
   const {
     loading: scanReceiptLoading,
@@ -17,6 +18,12 @@ export function ReceiptScanner({ onScanComplete }) {
   } = useFetch(scanReceipt);
 
   const handleReceiptScan = async (file) => {
+    if (!file || scanReceiptLoading) return;
+
+    const signature = `${file.name}-${file.size}-${file.lastModified}`;
+    if (lastFileRef.current === signature) return;
+    lastFileRef.current = signature;
+
     if (file.size > 5 * 1024 * 1024) {
       toast.error("File size should be less than 5MB");
       return;
@@ -24,6 +31,7 @@ export function ReceiptScanner({ onScanComplete }) {
 
     await scanReceiptFn(file);
   };
+
 
   useEffect(() => {
     if (scannedData && !scanReceiptLoading) {
