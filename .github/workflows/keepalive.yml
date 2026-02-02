@@ -8,10 +8,5 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Ping health endpoint
-        run: |
-          curl -s https://ai-finance-manager-app.vercel.app/api/health
-          sleep 5
-          curl -s https://ai-finance-manager-app.vercel.app/api/health
+      - run: curl https://ai-finance-manager-app.vercel.app/api/health
