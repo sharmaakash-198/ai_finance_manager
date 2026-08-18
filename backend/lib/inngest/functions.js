@@ -5,8 +5,7 @@ import EmailTemplate from "@/emails/template";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const CheckBudgetAlert = inngest.createFunction(
-    { name: "Check Budget Alerts" },
-    { cron: "0 */6 * * *" }, // Every 6 hours
+    { id: "check-budget-alerts", name: "Check Budget Alerts", cron: "0 */6 * * *" },
     async ({ step }) => {
         const budgets = await step.run("fetch-budget", async () => {
             return await db.budget.findMany({
@@ -106,10 +105,10 @@ function isNewMonth(lastAlertDate, currentDate) {
 // Trigger recurring transactions with batching
 export const triggerRecurringTransactions = inngest.createFunction(
     {
-        id: "trigger-recurring-transactions", // Unique ID,
+        id: "trigger-recurring-transactions",
         name: "Trigger Recurring Transactions",
+        cron: "0 0 * * *",
     },
-    { cron: "0 0 * * *" }, // Daily at midnight
     async ({ step }) => {
         const recurringTransactions = await step.run(
             "fetch-recurring-transactions",
@@ -155,13 +154,13 @@ export const processRecurringTransaction = inngest.createFunction(
     {
         id: "process-recurring-transaction",
         name: "Process Recurring Transaction",
+        event: "transaction.recurring.process",
         throttle: {
             limit: 10, // Process 10 transactions
             period: "1m", // per minute
             key: "event.data.userId", // Throttle per user
         },
     },
-    { event: "transaction.recurring.process" },
     async ({ event, step }) => {
         // Validate event data
         if (!event?.data?.transactionId || !event?.data?.userId) {
@@ -260,8 +259,8 @@ export const generateMonthlyReports = inngest.createFunction(
   {
     id: "generate-monthly-reports",
     name: "Generate Monthly Reports",
+    cron: "0 0 1 * *",
   },
-  { cron: "0 0 1 * *" }, // First day of each month
   async ({ step }) => {
     const users = await step.run("fetch-users", async () => {
       return await db.user.findMany({
