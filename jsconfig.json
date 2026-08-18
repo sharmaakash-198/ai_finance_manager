@@ -1,6 +1,14 @@
 {
   "compilerOptions": {
     "paths": {
+      "@/backend/*": ["./backend/*"],
+      "@/frontend/*": ["./frontend/*"],
+      "@/actions/*": ["./backend/actions/*"],
+      "@/lib/*": ["./backend/lib/*"],
+      "@/components/*": ["./frontend/components/*"],
+      "@/hooks/*": ["./frontend/hooks/*"],
+      "@/data/*": ["./frontend/data/*"],
+      "@/emails/*": ["./frontend/emails/*"],
       "@/*": ["./*"]
     }
   }
