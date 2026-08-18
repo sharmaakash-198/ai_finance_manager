@@ -2,15 +2,12 @@ name: Keep Supabase Awake
 
 on:
   schedule:
-    - cron: "0 6 * * *" # Once per day
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
-
     steps:
       - name: Ping database health endpoint
-        run: |
-          curl --fail --silent --show-error \
-          https://ai-finance-manager-app.vercel.app/api/health
+        run: curl --fail --silent --show-error https://ai-finance-manager-app.vercel.app/api/health
