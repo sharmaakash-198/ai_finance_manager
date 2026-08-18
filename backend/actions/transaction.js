@@ -153,7 +153,7 @@ export async function scanReceipt(file) {
             throw new Error("Request blocked");
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
 
         // convert file to arraybuffer
         const arrayBuffer = await file.arrayBuffer();
